@@ -1,0 +1,150 @@
+{
+  "updated": "2026-06",
+  "income": {
+    "note": "Net = gross minus 2026 income tax (0% to EUR22k, then 20/25/30/35%), 8.8% social insurance, 2.65% GHS. Monthly basis.",
+    "gross": { "minWage": 1088, "median": 1968, "mean": 2605 },
+    "net": { "minWage": 963, "median": 1716, "mean": 2152 },
+    "householdNet": {
+      "single": { "minimum": 963, "median": 1716, "above": 2152 },
+      "couple": { "minimum": 1926, "median": 3432, "above": 4304 }
+    }
+  },
+  "rents": {
+    "note": "Median asking rents (monthly EUR) for apartments, from live property-portal listings (Bazaraki/Spitogatos), June 2026. Sample sizes per district/size run from ~120 to ~1,470, except Famagusta, which is thin and holiday-skewed: its 2-bed (~23 listings) is used and its 1- and 3-bed are scaled from it. Asking rents run above what tenancies settle at.",
+    "national": { "1": 850, "2": 1150, "3": 1500 },
+    "Nicosia":  { "1": 650, "2": 900, "3": 1200 },
+    "Limassol": { "1": 1370, "2": 1800, "3": 2425 },
+    "Larnaca":  { "1": 825, "2": 1100, "3": 1450 },
+    "Paphos":   { "1": 1100, "2": 1300, "3": 2000 },
+    "Famagusta":{ "1": 1100, "2": 1500, "3": 2000 }
+  },
+  "buy": {
+    "note": "Median asking prices (EUR) for apartments, from live property-portal listings (Bazaraki/Spitogatos), June 2026, sample sizes ~75 to ~4,960. These are asking prices and run above transaction (closing) prices. Famagusta is bimodal (mainstream stock plus Ayia Napa luxury), so its 3-bed median sits close to its 2-bed.",
+    "Nicosia":  { "1": 145000, "2": 199000, "3": 320000 },
+    "Limassol": { "1": 305000, "2": 405000, "3": 685000 },
+    "Larnaca":  { "1": 170000, "2": 250000, "3": 292500 },
+    "Paphos":   { "1": 212500, "2": 332500, "3": 443500 },
+    "Famagusta":{ "1": 153000, "2": 222500, "3": 237500 }
+  },
+  "sizesSqm": {
+    "note": "Median floor area (m2) of listed apartments for sale, from the portal sample, used for price-per-m2.",
+    "Nicosia":  { "1": 51, "2": 83, "3": 115 },
+    "Limassol": { "1": 59, "2": 99, "3": 126 },
+    "Larnaca":  { "1": 52, "2": 99, "3": 109 },
+    "Paphos":   { "1": 54, "2": 85, "3": 123 },
+    "Famagusta":{ "1": 53, "2": 82, "3": 111 }
+  },
+  "geo": {
+    "note": "Approximate coordinates of each district's main urban centre (Republic-controlled area).",
+    "Nicosia":  { "lon": 33.36, "lat": 35.17 },
+    "Limassol": { "lon": 33.04, "lat": 34.70 },
+    "Larnaca":  { "lon": 33.62, "lat": 34.92 },
+    "Paphos":   { "lon": 32.43, "lat": 34.77 },
+    "Famagusta":{ "lon": 33.96, "lat": 35.01 }
+  },
+  "trends": {
+    "note": "Indexed to 2020 = 100. Wages: CYSTAT average gross earnings. Official rent: Eurostat HICP actual rentals (sitting tenants). Asking rent: author's index, consistent with the Eurostat-survey finding of ~23-28% over five years \u2014 indicative, the least precise series here.",
+    "years": [2020, 2022, 2024, 2025],
+    "wage": [100, 110, 121, 126],
+    "askingRent": [100, 112, 124, 128],
+    "officialRent": [100, 102, 106, 108],
+    "euRent": [100, 105, 110, 113],
+    "euWage": [100, 109, 121, 125]
+  },
+  "overburden": {
+    "note": "Eurostat EU-SILC ilc_lvho07a/07c, 2024. Share of population spending >40% of disposable income on housing.",
+    "allPopulation": { "cy": 2.4, "eu": 7.7 },
+    "marketTenant":  { "cy": 14.4, "eu": 19.2 },
+    "reducedOrFree": { "cy": 1.1, "eu": 10.0 },
+    "costShare":     { "cy": 11, "eu": 19 },
+    "arrearsRentMortgage": { "cy": 4.6, "eu": 3.0 },
+    "arrearsInclUtilities": { "cy": 14.3, "eu": 9.3 }
+  },
+  "tenure": {
+    "note": "Central Bank of Cyprus / Eurostat. Share of households.",
+    "ownership2015": 73.0, "ownership2025": 69.2,
+    "tenants2015": 27.0, "tenants2025": 30.8,
+    "homeLeavingAge": { "cy": 27.2, "eu": 26.2 },
+    "underOccupied": { "cy": 70, "eu": 33 },
+    "overcrowding": { "cy": 2, "euHighest": 41 }
+  },
+  "buyers2025": {
+    "note": "Department of Lands & Surveys, 2025. Shares of residential sales documents.",
+    "domestic": { "share": 59.9, "count": 10859 },
+    "eu": { "share": 13.5, "count": 2446 },
+    "nonEu": { "share": 26.5, "count": 4809 },
+    "foreignShare": 40.1,
+    "foreignShare18yrAvg": 36.2,
+    "foreignSharePwCAllTx": 28,
+    "domestic2018": 4875,
+    "districtMajorityDomestic": ["Nicosia", "Limassol", "Larnaca", "Famagusta"],
+    "districtForeignMajority": ["Paphos"],
+    "limassolValueShare": 41,
+    "marketValue2025bn": 6.5,
+    "topNonEuOrigins": ["Lebanon", "Israel", "Russia"]
+  },
+  "prices": {
+    "note": "PwC / CBC RPPI / Ask Wire, 2025-26.",
+    "apartmentsUnder250k": 71,
+    "middle80Range": [120000, 550000],
+    "limassolSeafrontM2": [4500, 7500],
+    "nicosiaSuburbM2": [2200, 3400],
+    "rppiYoY": 5.0, "rppiApartments": 6.4, "rppiHouses": 2.6,
+    "newHousingLoansBn": 2.0, "newHousingLoansGrowth": 36.4
+  },
+  "mortgage": {
+    "note": "Central Bank of Cyprus, bank product sheets, 2026.",
+    "avgRate": 3.45,
+    "firstHomeLtv": 80,
+    "depositMin": 20,
+    "termYears": 25,
+    "dtiCeiling": [30, 40],
+    "entryExample": { "price": 250000, "deposit": 50000, "loan": 200000, "rate": 4.0, "monthly": 1056 },
+    "foreclosure": { "first3mo": 80, "next3mo": 50 }
+  },
+  "supply": {
+    "note": "CYSTAT Census 2021 (official); permit data CYSTAT 2025; gap and idle-stock figures are attributed estimates.",
+    "census2021Total": 492931,
+    "census2021VacantOrTemp": 138113,
+    "census2021VacantPct": 28,
+    "occupiedShare2011": 69, "occupiedShare2021": 72,
+    "secondHomePaphos": 48, "secondHomeFamagusta": 46,
+    "authorisations2025": 16171,
+    "authorisations2025Growth": 42.7,
+    "permits2025": 6089,
+    "permits2025Growth": 29.4,
+    "authByDistrict": { "Nicosia": 5374, "Limassol": 4745, "Larnaca": 3778, "Paphos": 1729, "Famagusta": 545 },
+    "decadeGapEstimate": 43000,
+    "idleStockEstimateEtek": 35000,
+    "latentLandUnitsAskWire": 18000
+  },
+  "foreignTrend": {
+    "note": "Non-EU transfers of immovable property (DLS, via Parliament/auditor-general).",
+    "years": [2020, 2021, 2022, 2023, 2024],
+    "nonEuDeeds": [873, 1070, 1471, 2458, 2511],
+    "nonEuShare2024": 27.4
+  },
+  "context": {
+    "ownership2024": 69.4, "renters2024": 30.6,
+    "housesShare": 74, "apartmentsShare": 25, "roomsPerPerson": 2.0, "roomsPerPersonEu": 1.7,
+    "whyLowBurden": "A large share of owners hold their home outright \u2014 often inherited or family-built, in a country where mortgage finance came late and family support is the norm. Cost-free owners drag the all-household average down."
+  },
+  "flow2026": {
+    "note": "DLS sales + CYSTAT building permits, January 2026 (gov.cy). janResidentialValueYoY is the year-on-year growth in the VALUE of approved residential building (to EUR 336.6m); the dwelling-unit count grew 109.4% separately.",
+    "janSales": 1411, "janSalesYoY": 11,
+    "janPermitUnits": 1755, "janPermitUnitsYoY": 109,
+    "janApartmentUnits": 1248, "janApartmentYoY": 136,
+    "janResidentialValueYoY": 114,
+    "janResidentialValueM": 336.6,
+    "permitsToSales": 1.24,
+    "completionYears": "2027-2028"
+  },
+  "schemes": [
+    { "name": "Young-buyer grant (under 41)", "detail": "EUR20,000-50,000 toward a first home (max 150m²), across the 2024 and 2025 calls.", "reach": "525 applied for a scheme built to house ~400; 152 approved, 200 still pending" },
+    { "name": "Reduced VAT on first home", "detail": "5% on a primary residence vs 19% otherwise.", "reach": "Helps buyers who can already buy" },
+    { "name": "CLDC Affordable Rent", "detail": "EUR16M Agios Nikolaos (Limassol); EUR12M for 54 units in Strovolos; 181 units started 2025, 258 more in 2026.", "reach": "Hundreds of units against a ~43,000 gap" },
+    { "name": "Renovate-Rent", "detail": "EUR15,000-35,000 grants to return vacant homes to affordable rent for 4 years; EUR25M budget, 1,000-unit target.", "reach": "Under-subscribed: 43 applications, 28 approved" },
+    { "name": "Planning density bonus", "detail": "Up to +45% building density if part is residential; forecast ~10,000 homes in 2 years.", "reach": "Only ~1,300 (~13%) earmarked affordable" },
+    { "name": "Mortgage-to-Rent", "detail": "Suspends foreclosure on a primary residence for applicants since Jan 2024.", "reach": "Distress backstop, not access" }
+  ]
+}
