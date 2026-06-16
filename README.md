@@ -1,4 +1,4 @@
-# Cyprus Housing
+# Cyprus Housing Analysis
 
 An interactive look at housing affordability in Cyprus: what people earn, what
 renting and buying actually cost across the five districts, the deposit wall that
