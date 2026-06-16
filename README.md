@@ -8,14 +8,8 @@ the EU's lowest housing-cost share and a real affordability crisis at the same t
 Static React site (Vite). No backend — every figure
 lives in a single JSON file the component imports at build time.
 
-## Run locally
+🔗 Live: [https://cyprus-housing-analysis.vercel.app](https://cyprus-housing-analysis.vercel.app/)  ·  Read the full piece, interactive charts and all.
 
-```bash
-npm install
-npm run dev      # http://localhost:5173
-npm run build    # -> dist/
-npm run preview  # serve the production build
-```
 
 ## How the data works
 
@@ -30,27 +24,6 @@ listings (Bazaraki / Spitogatos), captured June 2026, with sample sizes in each
 compensation per employee) and CYSTAT. Overburden, arrears, tenure and under-occupation
 are Eurostat EU-SILC; buyer nationality, transactions and building permits are DLS,
 PwC and CYSTAT. Every series carries its source in the article footer.
-
-## Deploy (standalone site)
-
-Any static host works. Recommended: **Vercel** or **Cloudflare Pages** — free, custom
-domain, auto-deploy on push to `main`.
-
-1. Push this repo to GitHub.
-2. Import it in Vercel / Cloudflare Pages (Vite is auto-detected via `vercel.json`).
-  - Build command: `npm run build`
-  - Output directory: `dist`
-3. Add your domain. Every push to `main` redeploys.
-
-`base: './'` in `vite.config.js` keeps asset paths relative, so it also works from a
-project subpath or embedded.
-
-## Embedding in articles
-
-- **A site you control:** drop in an `<iframe>` pointing at the deployed URL.
-- **Medium:** Medium only embeds from its Embedly allow-list, so a custom iframe won't
-render. Link out to the live site and use a screenshot or a short screen-recording GIF
-inline. (Check Medium's current embed behaviour before publishing.)
 
 ## Attribution & fair use
 
