@@ -209,7 +209,7 @@ function WageLadder({ note, net }) {
       </div>
       <p className="laddernote">
         {note || (
-          <>Monthly gross pay. The <em>average</em> sits well above the <em>median</em> because a minority of high earners
+          <>The <em>average</em> sits well above the <em>median</em> because a minority of high earners
           pull it up &mdash; so the typical worker earns nearer the median. Use the interactive chart below to see how
           adding workers of different income levels affects the median and mean.</>
         )}
@@ -526,8 +526,9 @@ export default function App() {
           On the official measures, Cyprus looks comfortable: households spend a smaller share of their income on housing
           than anywhere else in the EU. Yet asking rents have risen about a quarter in five years, the deposit needed to
           buy keeps first-time buyers renting, and the government's main grant for under-41s drew 525 applicants for a
-          scheme intended for around 400 recipients, of whom 152 have so far been approved. Both things are true at once. What follows
-          is how that happens, and who carries the cost.
+          scheme intended for around 400 recipients, of whom 152 have so far been approved. So how can Cyprus have both
+          affordable housing based on EU reporting, but also demand exceeding supply for affordable housing grants? This
+          interactive article attempts to explore that.
         </p>
         <div className="herostats">
           <div className="hs"><span className="hsv">11%</span><span className="hsl">of income on housing across <em>all</em> households — lowest in the EU (avg 19%)</span></div>
@@ -551,8 +552,10 @@ export default function App() {
       <section className="band">
         <h2>Can a household afford to move out today?</h2>
         <p className="sub">
-          Headline comparisons often pit a single minimum-wage earner against the rent on a whole two-bedroom flat — a
-          situation almost no one is actually in. Choose a more realistic household and see what rent would take.
+          News articles and headlines often try to dramatise what's really going on, and can sometimes pit a single
+          minimum-wage earner against the rent on a two-bedroom flat — a situation almost no one is actually in. Using
+          the below interactive chart, we can see what a more realistic earner-household combo looks like, and how
+          affordable that is.
         </p>
         <Calculator />
       </section>
