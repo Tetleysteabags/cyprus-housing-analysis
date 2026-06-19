@@ -586,6 +586,31 @@ export default function App() {
         </p>
       </section>
 
+      <section>
+        <h2>Whose affordability?</h2>
+        <p className="body">
+          The figures so far have used a single median income. That median hides a divide. In 2024 the average wage was
+          almost identical for Cypriots and non-Cypriots — about €2,500 a month. The median was not: €2,053 for
+          Cypriots, €1,544 for everyone else. Non-Cypriots cluster at both ends — nearly half earn below €1,500, while
+          a smaller group of foreign professionals, many in Limassol's finance and tech firms, sit among the
+          island's top earners and help drive the demand that lifts prices at the top. It is the low-paid majority
+          for whom the sums stop working: on the same one-bedroom in Nicosia, rent that takes a third of a typical
+          Cypriot's pay takes nearly half of theirs.
+        </p>
+        <p className="body">
+          But the gap runs deeper than the published numbers show, because the lowest-paid are missing from them. The
+          minimum wage — €1,088 a month — does not cover domestic workers, farm labourers or hotel staff, the sectors
+          where migrant workers concentrate. A live-in domestic worker's legal salary is around €460 a month, and
+          inspectors have found some paid as little as €1.29 an hour; the earnings survey leaves household workers out
+          altogether. For them affordability barely registers as a ratio, because they sit outside the market: many live
+          in, housed by the employer in the home or on the farm they work, the rent folded into a job they cannot easily
+          leave. Others share — police checking a single Limassol flat found eleven people living in it; one block in
+          Chloraka housed some five hundred. That is the footnote that needs to be taken into account when looking at
+          Cyprus's housing statistics. The lowest housing-cost burden in the EU is, in part, a number that describes
+          the people the market counts — and not the ones it doesn't.
+        </p>
+      </section>
+
       <section className="band">
         <h2>How the official numbers stay low</h2>
         <p className="body">
