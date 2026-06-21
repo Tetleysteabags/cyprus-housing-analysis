@@ -126,6 +126,146 @@ function OverburdenFlip() {
   );
 }
 
+/* ---------- arrears: Cyprus vs EU ---------- */
+function ArrearsChart() {
+  const W = 680, H = 180, padL = 168, padR = 90, padT = 24, padB = 40;
+  const max = 16;
+  const rows = [
+    { label: "Rent or mortgage arrears", cy: DATA.overburden.arrearsRentMortgage.cy, eu: DATA.overburden.arrearsRentMortgage.eu },
+    { label: "Including utility bills", cy: DATA.overburden.arrearsInclUtilities.cy, eu: DATA.overburden.arrearsInclUtilities.eu },
+  ];
+  const x = (v) => padL + (v / max) * (W - padL - padR);
+  const band = (H - padT - padB) / rows.length;
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="chart" role="img" aria-label="Housing arrears, Cyprus vs EU average">
+      {[0, 5, 10, 15].map((t) => (
+        <g key={t}>
+          <line x1={x(t)} x2={x(t)} y1={padT} y2={H - padB} className="grid" />
+          <text x={x(t)} y={H - padB + 18} className="axis" textAnchor="middle">{t}%</text>
+        </g>
+      ))}
+      {rows.map((r, i) => {
+        const yc = padT + band * i + band / 2 - 20;
+        const ye = padT + band * i + band / 2 + 6;
+        return (
+          <g key={r.label}>
+            <text x={padL - 12} y={padT + band * i + band / 2} className="rowlab" textAnchor="end">{r.label}</text>
+            <rect x={padL} y={yc} width={x(r.cy) - padL} height={20} className="bar-cy" />
+            <text x={x(r.cy) + 8} y={yc + 15} className="barval-cy">{r.cy}%  Cyprus</text>
+            <rect x={padL} y={ye} width={x(r.eu) - padL} height={20} className="bar-eu" />
+            <text x={x(r.eu) + 8} y={ye + 15} className="barval-eu">{r.eu}%  EU avg</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+/* ---------- tenure: owners vs renters ---------- */
+function TenureStack() {
+  const own = DATA.context.ownership2024;
+  const rent = DATA.context.renters2024;
+  const W = 680, H = 88, padL = 12, padR = 12, padT = 36, barH = 36;
+  const innerW = W - padL - padR;
+  const wOwn = (own / 100) * innerW;
+  const wRent = (rent / 100) * innerW;
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="chart" role="img" aria-label="Household tenure in Cyprus">
+      <text x={padL} y={padT - 14} className="rowlab">Who the 11% average describes</text>
+      <rect x={padL} y={padT} width={wOwn} height={barH} className="seg-dom" />
+      <rect x={padL + wOwn} y={padT} width={wRent} height={barH} className="seg-eu" />
+      <text x={padL + wOwn / 2} y={padT + 24} className="segval" textAnchor="middle">{own}% owners</text>
+      <text x={padL + wOwn + wRent / 2} y={padT + 24} className="segval" textAnchor="middle">{rent}% renters</text>
+      <text x={padL} y={padT + barH + 22} className="ratiolab">Most owners hold outright — often inherited — so their housing cost is near zero beyond utilities.</text>
+    </svg>
+  );
+}
+
+/* ---------- supply: vacancy, renters trend, under-occupation ---------- */
+function SupplyVisuals() {
+  const W = 680, H = 248, pad = 12;
+  const colW = (W - pad * 2 - 24) / 3;
+  const cx = (i) => pad + i * (colW + 12) + colW / 2;
+  const occ = 100 - DATA.supply.census2021VacantPct;
+  const vac = DATA.supply.census2021VacantPct;
+  const r = 42;
+  const circ = 2 * Math.PI * r;
+  const vacLen = (vac / 100) * circ;
+
+  return (
+    <div className="supplygrid">
+      <svg viewBox={`0 0 ${W} ${H}`} className="chart" role="img" aria-label="Housing stock, renters and under-occupation">
+        {[0, 1, 2].map((i) => (
+          <line key={i} x1={cx(i)} x2={cx(i)} y1={28} y2={H - 16} className="grid" strokeDasharray="2 4" />
+        ))}
+
+        <g transform={`translate(${cx(0)},${118})`}>
+          <circle r={r} fill="none" stroke="var(--line)" strokeWidth={14} />
+          <circle r={r} fill="none" stroke="var(--calm)" strokeWidth={14}
+            strokeDasharray={`${(occ / 100) * circ} ${circ}`} transform="rotate(-90)" />
+          <text y={6} className="donutval" textAnchor="middle">{occ}%</text>
+          <text y={22} className="donutlab" textAnchor="middle">occupied</text>
+        </g>
+        <text x={cx(0)} y={28} className="paneltit" textAnchor="middle">2021 census</text>
+        <text x={cx(0)} y={196} className="panellab" textAnchor="middle">{vac}% vacant or temporary</text>
+        <text x={cx(0)} y={214} className="panellab" textAnchor="middle">mostly second homes</text>
+
+        <g>
+          <text x={cx(1)} y={28} className="paneltit" textAnchor="middle">Renting households</text>
+          <line x1={cx(1) - 40} x2={cx(1) + 40} y1={118} y2={118} className="axisline" />
+          <circle cx={cx(1) - 40} cy={118} r={5} className="dot-cy" />
+          <circle cx={cx(1) + 40} cy={118 - (DATA.tenure.tenants2025 - DATA.tenure.tenants2015) * 4} r={5} className="dot-cy" />
+          <line x1={cx(1) - 40} y1={118} x2={cx(1) + 40} y2={118 - (DATA.tenure.tenants2025 - DATA.tenure.tenants2015) * 4} className="trendline" />
+          <text x={cx(1) - 40} y={138} className="axis" textAnchor="middle">2015</text>
+          <text x={cx(1) + 40} y={138} className="axis" textAnchor="middle">2025</text>
+          <text x={cx(1) - 40} y={104} className="panellab" textAnchor="middle">{DATA.tenure.tenants2015}%</text>
+          <text x={cx(1) + 40} y={104 - (DATA.tenure.tenants2025 - DATA.tenure.tenants2015) * 4} className="panellab" textAnchor="middle">{DATA.tenure.tenants2025}%</text>
+        </g>
+
+        <g>
+          <text x={cx(2)} y={28} className="paneltit" textAnchor="middle">Under-occupied homes</text>
+          <text x={cx(2) - 52} y={104} className="rowlab" textAnchor="end">EU</text>
+          <rect x={cx(2) - 44} y={92} width={(DATA.tenure.underOccupied.eu / 80) * 88} height={18} className="bar-eu" />
+          <text x={cx(2) - 44 + (DATA.tenure.underOccupied.eu / 80) * 88 + 6} y={106} className="barval-eu">{DATA.tenure.underOccupied.eu}%</text>
+          <text x={cx(2) - 52} y={142} className="rowlab" textAnchor="end">CY</text>
+          <rect x={cx(2) - 44} y={130} width={(DATA.tenure.underOccupied.cy / 80) * 88} height={18} className="bar-cy" />
+          <text x={cx(2) - 44 + (DATA.tenure.underOccupied.cy / 80) * 88 + 6} y={144} className="barval-cy">{DATA.tenure.underOccupied.cy}%</text>
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+/* ---------- policy demand vs capacity ---------- */
+function SchemeScale() {
+  const gap = DATA.supply.decadeGapEstimate;
+  const applicants = 525;
+  const capacity = 400;
+  const W = 680, H = 130, padL = 130, padR = 70, padT = 16;
+  const max = gap;
+  const x = (v) => padL + (v / max) * (W - padL - padR);
+  const rows = [
+    { label: "Young-buyer applicants", v: applicants, cls: "bar-cy" },
+    { label: "Scheme capacity", v: capacity, cls: "bar-permit" },
+    { label: "Estimated housing gap", v: gap, cls: "bar-rise" },
+  ];
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="chart" role="img" aria-label="Policy scale versus housing shortfall">
+      {rows.map((r, i) => {
+        const y = padT + i * 36;
+        return (
+          <g key={r.label}>
+            <text x={padL - 12} y={y + 24} className="rowlab" textAnchor="end">{r.label}</text>
+            <rect x={padL} y={y} width={Math.max(x(r.v) - padL, 2)} height={28} className={r.cls} />
+            <text x={x(r.v) + 8} y={y + 20} className="barnum">{r.v.toLocaleString()}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
 /* ---------- national buyer composition ---------- */
 function BuyerSplit() {
   const W = 680, H = 130, padL = 12, padR = 12, padT = 30, padB = 40;
@@ -349,6 +489,22 @@ function RentWageDivergence() {
           <span key={l.k} className="leg"><span className={"legline " + l.cls} />{l.lab}</span>
         ))}
       </div>
+      <div className="rwstats">
+        {[
+          { k: "askingRent", lab: "Asking rents" },
+          { k: "euRent", lab: "EU rents" },
+          { k: "wage", lab: "Cyprus wages" },
+          { k: "officialRent", lab: "Official rent index" },
+        ].map(({ k, lab }) => {
+          const end = t[k][t[k].length - 1];
+          return (
+            <div key={k} className="rwstat">
+              <span className="rwval">+{end - 100}%</span>
+              <span className="rwlab">{lab}</span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -563,11 +719,7 @@ export default function App() {
       <section>
         <h2>Matching households to the homes they would rent</h2>
         <p className="body">
-          Against current asking rents, most households are stretched. A single person on the minimum wage cannot afford
-          a one-bed in any city. A single person on median pay is close to the 40% line in Nicosia and well beyond it in
-          Limassol. A couple on two minimum wages is overburdened in both. The only household that stays comfortably below
-          the line is a couple on two median salaries, and only in Nicosia; in Limassol, where prices are set by an
-          international market, even they are overburdened.
+          At median asking rents, most household types cross the 40% overburden line — especially in Limassol.
         </p>
         <div className="tablewrap">
           <table className="matched">
@@ -586,43 +738,14 @@ export default function App() {
         </p>
       </section>
 
-      <section>
-        <h2>Whose affordability?</h2>
-        <p className="body">
-          The figures so far have used a single median income. That median hides a divide. In 2024 the average wage was
-          almost identical for Cypriots and non-Cypriots — about €2,500 a month. The median was not: €2,053 for
-          Cypriots, €1,544 for everyone else. Non-Cypriots cluster at both ends — nearly half earn below €1,500, while
-          a smaller group of foreign professionals, many in Limassol's finance and tech firms, sit among the
-          island's top earners and help drive the demand that lifts prices at the top. It is the low-paid majority
-          for whom the sums stop working: on the same one-bedroom in Nicosia, rent that takes a third of a typical
-          Cypriot's pay takes nearly half of theirs.
-        </p>
-        <p className="body">
-          But the gap runs deeper than the published numbers show, because the lowest-paid are missing from them. The
-          minimum wage — €1,088 a month — does not cover domestic workers, farm labourers or hotel staff, the sectors
-          where migrant workers concentrate. A live-in domestic worker's legal salary is around €460 a month, and
-          inspectors have found some paid as little as €1.29 an hour; the earnings survey leaves household workers out
-          altogether. For them affordability barely registers as a ratio, because they sit outside the market: many live
-          in, housed by the employer in the home or on the farm they work, the rent folded into a job they cannot easily
-          leave. Others share — police checking a single Limassol flat found eleven people living in it; one block in
-          Chloraka housed some five hundred. That is the footnote that needs to be taken into account when looking at
-          Cyprus's housing statistics. The lowest housing-cost burden in the EU is, in part, a number that describes
-          the people the market counts — and not the ones it doesn't.
-        </p>
-      </section>
-
       <section className="band">
         <h2>How the official numbers stay low</h2>
         <p className="body">
-          That 11% is what households spend on housing as a share of income, as Eurostat measures it, and the measure
-          counts bills, rent and mortgage interest, but not the capital repaid on a mortgage. Two things keep it low in
-          Cyprus. Most people own their home (69%), and most of those outright, with no mortgage at all. This is in large
-          part a result of families passing property down between generations, so a large group has almost no housing cost
-          beyond utilities. And for those who are buying, the measure counts only the interest, not the full repayment, so
-          it understates what a buyer actually pays each month. The number is accurate, but it describes people who are
-          already housed. The pressure falls on those entering the market: renters signing new leases, buyers short of a
-          deposit, and recent arrivals. Averaged across everyone, that group disappears from the figure.
+          Eurostat measures what households spend on housing as a share of their income, counting utility bills, rent and
+          the interest on a mortgage, and in Cyprus that comes to 11%. The average describes people who are already housed —
+          not those signing new leases or saving for a deposit.
         </p>
+        <TenureStack />
         <OverburdenFlip />
         <p className="caption">
           Source: Eurostat EU-SILC, 2024. Even Cyprus's exposed renters (14.4%) are less overburdened than the average EU
@@ -634,51 +757,39 @@ export default function App() {
       <section>
         <h2>Did rents outpace pay? It depends what you measure</h2>
         <p className="body">
-          The answer is mixed. Asking rents rose about a quarter over five years, while Cypriot pay also rose strongly:
-          average earnings were up by more than a fifth, and the median moved in step, so this is not simply the average
-          being lifted by top earners. Cyprus's wage growth was close to the EU's over the same period — roughly 25% in
-          both. The difference is in rents. EU rents rose about 13% over five years; Cyprus's asking rents rose roughly
-          twice as fast. So in aggregate Cypriot rents and wages broadly kept pace with each other, but that is not the
-          same as affordability: a household entering the market already spends more than 40% of take-home pay on rent, and
-          the two figures rising together does not ease the squeeze, because those households must pay their rent and save
-          for a deposit at the same time. Cyprus's own official index, which tracks sitting tenants on older leases, barely
-          moved — which is why the headline measures stay low while advertised rents do not. The most recent figures are
-          sharper still: the Department of Lands and Surveys recorded the average rent on a Nicosia three-bedroom flat
-          rising from €950 to €1,300 in a single year.
+          Wages and asking rents both rose strongly since 2020 — but Cyprus rents moved roughly twice as fast as the EU,
+          while the official rent index for sitting tenants barely moved. That gap is why headline measures stay calm while
+          movers face a sharper market.
         </p>
         <RentWageDivergence />
         <p className="caption">
-          Indexed to 2020 = 100. Cyprus wages: CYSTAT; EU comparison: Eurostat (HICP actual rentals and euro-area
-          compensation per employee). The Cyprus asking-rent line is the author's index, consistent with the Eurostat
-          survey's ~23–28% five-year rise; it is the least precise series here. Cyprus wages tracked EU wages so closely
-          that a separate EU-wage line would sit on top of the Cyprus one, so it is omitted.
+          Indexed to 2020 = 100. Cyprus wages: CYSTAT; EU rents: Eurostat HICP actual rentals. The Cyprus asking-rent line
+          is the author's index from listing data. Cyprus wages tracked EU wages closely enough that a separate EU-wage
+          line would sit on top — so it is omitted. DLS recorded a Nicosia three-bedroom average rent rising from €950 to
+          €1,300 in a single year (2024–25).
         </p>
       </section>
 
       <section>
         <h2>Arrears: the measure that is rising</h2>
         <p className="body">
-          If the burden ratios look reassuring, one measure does not: how many people fall behind on payments. Looking at
-          housing-only, <strong>4.6%</strong> of Cypriots are in arrears on rent or mortgage, against an EU average of 3%
-          (Eurostat, 2024). Including utility bills, the figure rises to <strong>14.3%</strong>, the fourth-highest in the
-          EU after Greece, Bulgaria and Romania, against a 9.3% average. Arrears, unlike the burden ratio, capture
-          households at the edge: people who are housed, but only just. Difficulty tends to appear here, in missed
-          payments, before it shows up in an averaged cost-of-housing figure.
+          Arrears capture households at the edge — people who are housed, but only just — before strain shows up in an
+          averaged cost-of-housing figure.
+        </p>
+        <ArrearsChart />
+        <p className="caption">
+          Source: Eurostat EU-SILC, 2024. Including utilities, Cyprus ranks fourth-highest in the EU after Greece, Bulgaria
+          and Romania.
         </p>
       </section>
 
       <section>
         <h2>Prices by district</h2>
         <p className="sub">
-          The island-wide averages hide wide differences by location. Switch between rent and purchase, and between
-          bedroom counts; Limassol stands well above the rest on both measures.
+          Island-wide averages hide wide differences by location. Switch between rent and purchase, and between bedroom
+          counts — Limassol stands well above the rest.
         </p>
         <CyprusMap />
-        <p className="body" style={{ marginTop: 20 }}>
-          Per square metre the gap is just as wide. A two-bedroom flat costs around €4,100/m² to buy in Limassol and
-          €3,900 in Paphos, against roughly €2,400 in Nicosia and €2,500 in Larnaca — and rents follow the same pattern,
-          near €19 per m² a month in Limassol versus about €11 in Nicosia.
-        </p>
         <p className="caption">
           Median asking prices for apartments from live property-portal listings (Bazaraki/Spitogatos), June 2026.
           Asking prices, especially for sale, run above transaction (closing) prices. Republic-controlled areas;
@@ -689,29 +800,10 @@ export default function App() {
       <section>
         <h2>Renting is expensive; buying is blocked</h2>
         <p className="body">
-          Andreas and Elena are both 30. They married last year and still live with Elena's parents in Strovolos, on the
-          edge of Nicosia — Cypriots leave the parental home at 27.2 on average, against the EU's 26.2, and many stay on
-          longer while they save. He keeps the books for a small firm; she is a nurse at the general hospital. Between them
-          they take home about €3,400 a month — each earns close to the median wage of {eur(DATA.income.gross.median)} a
-          month, around €23,600 a year before tax — a typical Cypriot household.
-        </p>
-        <p className="body">
-          They want a two-bedroom flat of their own. In Nicosia that costs about €200,000, with roughly €40,000 needed in
-          cash up front. The monthly payment is not the obstacle: the mortgage would run about €790 a month — less than
-          the {eur(DATA.rents.Nicosia["2"])} rent on the same flat, and comfortably inside the bank's limit that repayments
-          stay within {DATA.mortgage.dtiCeiling[0]} to {DATA.mortgage.dtiCeiling[1]}% of income. The deposit is the
-          obstacle. If they stay with Elena's parents and save what they would otherwise pay in rent, they reach €40,000 in
-          about three years; if they move into a one-bedroom of their own first, at around {eur(DATA.rents.Nicosia["1"])} a
-          month, it takes closer to five. Either way, the flats within reach are seldom the ones being built — and, like
-          most couples they know, their realistic route to a deposit is the one the official figures never capture: help
-          from their parents.
-        </p>
-        <p className="body">
-          And Andreas and Elena are the comfortable case — a dual-income couple on median pay, for whom the barrier is time
-          and the deposit rather than the monthly payment. Lower down it is harder still: a single person on median pay, or
-          a couple on two minimum wages, can just about meet the repayments on a small flat, but the deposit — years of
-          saving while paying rent — is the wall most cannot clear. Ownership stays furthest from the same households the
-          rental market is already stretching.
+          Andreas and Elena are both 30, still living with her parents in Strovolos while they save. Between them they take
+          home about €3,400 a month — a typical dual-income couple on median pay. They want a two-bedroom in Nicosia for
+          about €200,000; the mortgage would cost less than rent, but they need roughly €40,000 up front. The monthly payment
+          is not the obstacle — the deposit is.
         </p>
         <WageLadder net note={<>Monthly take-home (net) pay per worker. A couple's household income is two of these, so
           a median couple takes home about {eur(DATA.income.net.median * 2)} — the figure the savings estimate below uses.</>} />
@@ -721,23 +813,10 @@ export default function App() {
       <section className="band">
         <h2>Foreign buyers, in proportion</h2>
         <p className="body">
-          Limassol's prices point to the role of foreign money, but the common claim that foreigners are buying up the
-          island is only half right. Foreign buyers, EU and non-EU together, accounted for
-          {" "}{DATA.buyers2025.foreignShare}% of residential sales in 2025 — high, but close to the 18-year average of
-          {" "}{DATA.buyers2025.foreignShare18yrAvg}%. The split matters: EU buyers were {DATA.buyers2025.eu.share}% and
-          non-EU buyers {DATA.buyers2025.nonEu.share}%, with the non-EU share concentrated on the coast. Limassol stands
-          apart for a related but separate reason: its high prices mean it alone accounts for
-          {" "}{DATA.buyers2025.limassolValueShare}% of all transaction value. Nationally, though, locals are not being
-          shut out — domestic purchases nearly doubled, from {DATA.buyers2025.domestic2018.toLocaleString()} in 2018 to
-          {" "}{DATA.buyers2025.domestic.count.toLocaleString()} in 2025.
+          Foreign buyers accounted for {DATA.buyers2025.foreignShare}% of residential sales in 2025 — high, but close to the
+          18-year average. Locals are not being shut out: domestic purchases nearly doubled since 2018.
         </p>
         <BuyerSplit />
-        <p className="body" style={{ marginTop: 18 }}>
-          The foreign share is also levelling off rather than accelerating. Transfers to non-EU buyers nearly tripled,
-          from {DATA.foreignTrend.nonEuDeeds[0].toLocaleString()} in 2020 to {DATA.foreignTrend.nonEuDeeds[3].toLocaleString()}
-          {" "}in 2023, during the golden-visa boom, then flattened in 2024, with the headline share easing back from its
-          2022 peak.
-        </p>
         <ForeignTrend />
         <p className="caption">
           Non-EU transfers of immovable property (DLS / Parliament): a sharp rise to 2023, then a plateau. National buyer
@@ -748,57 +827,32 @@ export default function App() {
       <section>
         <h2>Enough homes, but not where they are needed</h2>
         <p className="body">
-          The fullest count is the 2021 census, which Cyprus conducts only once a decade:
-          {" "}{DATA.supply.census2021Total.toLocaleString()} dwellings, of which
-          {" "}{DATA.supply.census2021VacantOrTemp.toLocaleString()} (about {DATA.supply.census2021VacantPct}%) were vacant
-          or temporary. Most of that is holiday and second homes, concentrated in Paphos and Famagusta (about
-          {" "}{DATA.supply.secondHomePaphos}% and {DATA.supply.secondHomeFamagusta}%), rather than empty flats available to
-          let. Industry bodies put genuinely idle urban stock much lower: ETEK estimates about
-          {" "}{DATA.supply.idleStockEstimateEtek.toLocaleString()} units drawing near-zero electricity. The shortage is
-          therefore not of housing in general — the renting share has risen from 27.1% in 2014 to {DATA.context.renters2024}%
-          — but of modern, long-term rental homes in the cities where the jobs are. Cyprus has the EU's highest share of
-          under-occupied homes ({DATA.tenure.underOccupied.cy}% against {DATA.tenure.underOccupied.eu}%): space exists, but
-          much of it is owner-occupied and in the wrong places.
+          The shortage is not of housing in general, but of modern long-term rental homes in the cities where the jobs are.
+          Much vacant stock is holiday and second homes; a growing share of what could be long-term housing has moved to
+          tourists — an estimated 12,000–13,000 short-term units, concentrated on the coast.
         </p>
-        <p className="body">
-          A growing share of what could be long-term housing has also moved to tourists. Short-term holiday lets in the
-          government-controlled areas have risen roughly sixfold in under three years, to an estimated 12,000–13,000 units,
-          and they are concentrated in the coastal districts — Paphos, Limassol and Famagusta — where asking rents are
-          highest. A proposed cap on them was rejected in 2025, and each additional unit let to tourists is one removed
-          from the long-term market. Cities from Amsterdam to Barcelona have capped or phased out short-term lets for the
-          same reason, though the evidence that this lowers rents is mixed; and a tourism-dependent economy like Cyprus's,
-          where holiday lets are a far larger share of local stock than in a big capital, faces a sharper trade-off than
-          most.
+        <SupplyVisuals />
+        <p className="caption">
+          Census: CYSTAT 2021. Under-occupation and renting share: Eurostat / Central Bank of Cyprus. ETEK estimates about
+          {" "}{DATA.supply.idleStockEstimateEtek.toLocaleString()} genuinely idle urban units — far below census vacancy.
         </p>
       </section>
 
       <section className="band">
         <h2>Building is picking up, but the question is what kind</h2>
         <p className="body">
-          In January 2026, CYSTAT recorded permits for
-          {" "}{DATA.flow2026.janPermitUnits.toLocaleString()} new homes, up {DATA.flow2026.janPermitUnitsYoY}% on a year
-          earlier, against {DATA.flow2026.janSales.toLocaleString()} sales recorded by the Land Registry. This basically
-          means that the approved pipeline is running ahead of the sales pace: more new homes are being approved for
-          construction than are currently being bought, a sign that new construction may be starting to catch up with
-          demand.
+          In January 2026, approved permits outpaced sales for the first time in years — but the surge is overwhelmingly
+          apartments, and little of the new stock is affordable long-term rental housing.
         </p>
         <PermitsSales />
-        <p className="body" style={{ marginTop: 18 }}>
-          The thing to look at is the composition of these new permits and dwellings. The surge is overwhelmingly
-          apartments — apartment units were up {DATA.flow2026.janApartmentYoY}% year-on-year in January. But most new
-          apartments go to owner-occupiers or to individual landlords, not into the long-term rental pool (PwC), and little
-          of the new stock is the affordable, long-term rental housing that is missing. More construction does not
-          automatically mean cheaper rents.
-        </p>
       </section>
 
       <section className="band">
         <h2>What the state is doing, and its scale</h2>
         <p className="sub">
-          The policy response is real but small against the shortfall. Demand is the clearest sign: more than 560
-          applications have come in across the new affordable schemes, and the main young-buyer grant alone drew 525, for a
-          programme intended for around 400 recipients.
+          The policy response is real but small against the shortfall.
         </p>
+        <SchemeScale />
         <div className="tablewrap">
           <table className="schemes">
             <thead><tr><th>Scheme</th><th>What it gives</th><th>Reality check</th></tr></thead>
@@ -814,13 +868,9 @@ export default function App() {
       <section>
         <h2>The bottom line</h2>
         <p className="body">
-          Cyprus still has one of the lowest housing burdens in the EU, and that is what the averages capture. But the
-          margin is narrowing unevenly: asking rents have risen roughly twice as fast as the EU average over five years,
-          the price-to-income ratio rose 0.6% here in 2024 while it fell 1.7% across the bloc (Eurostat), and arrears already run above average.
-          The cost is not carried by the average household but by those entering the market — renters signing new leases,
-          couples short of a deposit, workers who have moved for a job. Cyprus is not the worst in Europe, and is unlikely
-          to become so soon. The open questions are which direction it moves, and whether the homes now being built are
-          ones those households can afford to live in.
+          Cyprus still has one of the lowest housing burdens in the EU — but the margin is narrowing unevenly, and the
+          cost falls on those entering the market. The open question is whether the homes now being built are ones those
+          households can afford to live in.
         </p>
       </section>
 
@@ -988,6 +1038,21 @@ h2::before{content:"";position:absolute;top:0;left:0;width:36px;height:3px;backg
 .legline.ln-wage{border-color:var(--calm);}
 .legline.ln-off{border-color:#bdb7a6;}
 
+/* rent-wage stat row */
+.rwstats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line);}
+.rwstat{text-align:center;}
+.rwval{display:block;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:20px;color:var(--ink);letter-spacing:-.02em;}
+.rwlab{display:block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted);margin-top:4px;line-height:1.35;}
+
+/* supply panel */
+.supplygrid{margin:8px 0 4px;}
+.paneltit{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;fill:var(--ink);}
+.panellab{font-family:'IBM Plex Mono',monospace;font-size:10.5px;fill:var(--muted);}
+.donutval{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:600;fill:var(--ink);}
+.donutlab{font-family:'IBM Plex Mono',monospace;font-size:10.5px;fill:var(--muted);}
+.dot-cy{fill:var(--calm);}
+.trendline{stroke:var(--calm);stroke-width:2;fill:none;}
+
 /* map */
 .mapwrap{margin:8px 0 10px;}
 .mapctrl{display:flex;flex-wrap:wrap;gap:12px 20px;margin-bottom:12px;}
@@ -1020,6 +1085,7 @@ tbody td{padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:to
   .hero{padding-top:64px;}
   .herostats{grid-template-columns:1fr;column-gap:0;}
   .calcgrid{grid-template-columns:1fr;}
+  .rwstats{grid-template-columns:1fr 1fr;}
   section,.band{padding-top:64px;}
 }
 @media(prefers-reduced-motion:reduce){.meterfill{transition:none;}}
