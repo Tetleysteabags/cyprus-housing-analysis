@@ -43,13 +43,30 @@
     "Famagusta":{ "lon": 33.96, "lat": 35.01 }
   },
   "trends": {
-    "note": "Indexed to 2020 = 100. Wages: CYSTAT average gross earnings. Official rent: Eurostat HICP actual rentals (sitting tenants). Asking rent: author's index, consistent with the Eurostat-survey finding of ~23-28% over five years \u2014 indicative, the least precise series here.",
+    "note": "Indexed to 2020 = 100. Wages: CYSTAT average gross earnings. Official rent: Eurostat HICP actual rentals (sitting tenants). Asking rent: author's index from listings. RPPI: CBC transaction purchase prices, Q4 readings reindexed to 2020Q4=100.",
     "years": [2020, 2022, 2024, 2025],
     "wage": [100, 110, 121, 126],
     "askingRent": [100, 112, 124, 128],
     "officialRent": [100, 102, 106, 108],
     "euRent": [100, 105, 110, 113],
-    "euWage": [100, 109, 121, 125]
+    "euWage": [100, 109, 121, 125],
+    "rppi": [100, 109, 129, 138]
+  },
+  "cbcRppi": {
+    "note": "CBC Residential Property Price Index (RPPI), transaction (closing) prices. Index base 2010Q1=100. Q4 figures unless noted.",
+    "quarter": "2025Q4",
+    "headlineYoY": 7.1,
+    "priorQuarterYoY": 5.0,
+    "apartmentsYoY": 9.6,
+    "housesYoY": 3.4,
+    "indexQ4": { "2020": 76.0, "2024": 97.8, "2025": 104.7 },
+    "districtYoY": {
+      "Nicosia": 1.0,
+      "Limassol": 9.9,
+      "Larnaca": 8.3,
+      "Paphos": 7.6,
+      "Famagusta": 0.1
+    }
   },
   "overburden": {
     "note": "Eurostat EU-SILC ilc_lvho07a/07c, 2024. Share of population spending >40% of disposable income on housing.",
@@ -84,13 +101,15 @@
     "topNonEuOrigins": ["Lebanon", "Israel", "Russia"]
   },
   "prices": {
-    "note": "PwC / CBC RPPI / Ask Wire, 2025-26.",
+    "note": "CBC RPPI Q4 2025; new housing loans CBC MFI statistics.",
     "apartmentsUnder250k": 71,
     "middle80Range": [120000, 550000],
     "limassolSeafrontM2": [4500, 7500],
     "nicosiaSuburbM2": [2200, 3400],
-    "rppiYoY": 5.0, "rppiApartments": 6.4, "rppiHouses": 2.6,
-    "newHousingLoansBn": 2.0, "newHousingLoansGrowth": 36.4
+    "rppiYoY": 7.1, "rppiApartments": 9.6, "rppiHouses": 3.4,
+    "rppiPriorYoY": 5.0,
+    "newHousingLoansBn": 2.0, "newHousingLoansGrowth": 36.4,
+    "newHousingLoansNote": "Year-on-year growth in new housing loans (CBC MFI statistics). Rising lending reflects demand chasing a thin supply of homes to buy — not proof that mortgages have become affordable."
   },
   "mortgage": {
     "note": "Central Bank of Cyprus, bank product sheets, 2026.",
@@ -115,6 +134,7 @@
     "permits2025Growth": 29.4,
     "authByDistrict": { "Nicosia": 5374, "Limassol": 4745, "Larnaca": 3778, "Paphos": 1729, "Famagusta": 545 },
     "decadeGapEstimate": 43000,
+    "decadeGapEstimateSource": "Sector estimate aired at a 2026 housing-policy discussion in Nicosia (reported by Cyprus Property News) — attributed, not an official census figure.",
     "idleStockEstimateEtek": 35000,
     "latentLandUnitsAskWire": 18000
   },
