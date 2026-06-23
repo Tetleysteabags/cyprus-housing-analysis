@@ -732,6 +732,13 @@ export default function App() {
       <header className="hero">
         <p className="eyebrow">Cyprus &middot; housing &middot; {DATA.updated}</p>
         <h1>The most affordable housing in the EU. And a housing crisis. <em>Can both be true?</em></h1>
+        <p className="byline">
+          By <a href="https://medium.com/@thomascgeorgiou" rel="noopener noreferrer">Thomas Georgiou</a>
+          <span className="bysep">·</span>
+          <a href="https://medium.com/@thomascgeorgiou" rel="noopener noreferrer">Medium</a>
+          <span className="bysep">·</span>
+          <a href="https://www.linkedin.com/in/thomascgeorgiou/" rel="noopener noreferrer">LinkedIn</a>
+        </p>
         <p className="lede">
           On the official measures, Cyprus looks comfortable: households spend a smaller share of their income on housing
           than anywhere else in the EU. Yet asking rents have risen about a quarter in five years, the deposit needed to
@@ -1024,6 +1031,13 @@ export default function App() {
           application and approval figures: Interior Minister Constantinos Ioannou, in replies to parliamentary questions
           (2025–26).
         </p>
+        <p className="authorfoot">
+          By <a href="https://medium.com/@thomascgeorgiou" rel="noopener noreferrer">Thomas Georgiou</a>
+          <span className="bysep">·</span>
+          <a href="https://medium.com/@thomascgeorgiou" rel="noopener noreferrer">Medium</a>
+          <span className="bysep">·</span>
+          <a href="https://www.linkedin.com/in/thomascgeorgiou/" rel="noopener noreferrer">LinkedIn</a>
+        </p>
       </footer>
     </div>
   );
@@ -1033,7 +1047,7 @@ const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
 .page{
-  --paper:#f3f1ea; --card:#fbfaf5; --ink:#1c1b18; --muted:#666056; --line:#e2ddcf;
+  --paper:#f3f1ea; --card:#fbfaf5; --ink:#1c1b18; --muted:#666056; --faint:#a39e90; --line:#e2ddcf;
   --calm:#345b86; --warn:#bf8a2c; --alarm:#c5532e; --calm-soft:#e7edf3; --alarm-soft:#f6e6de;
   background:var(--paper); color:var(--ink);
   font-family:'Source Serif 4',Georgia,serif; line-height:1.72; font-size:18px;
@@ -1045,7 +1059,12 @@ const CSS = `
 /* hero */
 .hero{padding-top:92px;padding-bottom:8px;}
 .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:26px;}
-h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(36px,6.2vw,60px);line-height:1.02;letter-spacing:-.025em;margin-bottom:26px;}
+h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(36px,6.2vw,60px);line-height:1.02;letter-spacing:-.025em;margin-bottom:10px;}
+.byline{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--faint);margin-bottom:22px;letter-spacing:.02em;}
+.authorfoot{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--faint);margin-top:22px;letter-spacing:.02em;}
+.byline a,.authorfoot a{color:inherit;text-decoration:none;border-bottom:none;}
+.byline a:hover,.authorfoot a:hover{color:var(--calm);}
+.bysep{margin:0 7px;opacity:.65;}
 h1 em{font-style:normal;color:var(--alarm);}
 .lede{font-size:21px;line-height:1.62;color:#393730;max-width:600px;margin-bottom:44px;}
 .herostats{display:grid;grid-template-columns:1fr 1fr;column-gap:34px;margin-bottom:8px;border-top:1.5px solid var(--ink);}
