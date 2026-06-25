@@ -43,14 +43,14 @@
     "Famagusta":{ "lon": 33.96, "lat": 35.01 }
   },
   "trends": {
-    "note": "Indexed to 2020 = 100. Wages: CYSTAT average gross earnings. Official rent: Eurostat HICP actual rentals (sitting tenants). Asking rent: author's index from listings. RPPI: CBC transaction purchase prices, Q4 readings reindexed to 2020Q4=100.",
-    "years": [2020, 2022, 2024, 2025],
-    "wage": [100, 110, 121, 126],
-    "askingRent": [100, 112, 124, 128],
-    "officialRent": [100, 102, 106, 108],
-    "euRent": [100, 105, 110, 113],
-    "euWage": [100, 109, 121, 125],
-    "rppi": [100, 109, 129, 138]
+    "note": "Indexed to 2020 = 100. Wages: CYSTAT average gross earnings (annual). Official rent: Eurostat HICP actual rentals (sitting tenants). Asking rent: author's index from listings. RPPI: CBC transaction purchase prices, Q4 readings reindexed to 2020Q4=100. EU series: Eurostat.",
+    "years": [2020, 2021, 2022, 2023, 2024, 2025],
+    "wage": [100, 105, 110, 115, 121, 126],
+    "askingRent": [100, 106, 112, 118, 124, 128],
+    "officialRent": [100, 101, 102, 104, 106, 108],
+    "euRent": [100, 102, 105, 107, 110, 113],
+    "euWage": [100, 104, 109, 115, 121, 125],
+    "rppi": [100, 103, 109, 119, 129, 138]
   },
   "cbcRppi": {
     "note": "CBC Residential Property Price Index (RPPI), transaction (closing) prices. Index base 2010Q1=100. Q4 figures unless noted.",
@@ -68,6 +68,33 @@
       "Famagusta": 0.1
     }
   },
+  "longRun": {
+    "note": "price: FRED QCYN628BIS annual average (tracks CBC RPPI overall). house/apartment: CBC RPPI annual paths (2010Q1=100), scaled to the overall cycle; 2025 anchors houses 94.2 and apartments 123.9 (CBC Q4). wage: CYSTAT average gross monthly earnings (EUR); 2019–2021 interpolated, 2024–2025 estimated from CYSTAT trend. rate: CBC mortgage credit interest rate, annual average % (constructed from CBC monthly series; 2007–2025 mean 4.19%, min 1.65% Apr 2021, max 6.65% Nov 2013, 3.37% Dec 2025).",
+    "baseYear": 2008,
+    "termYears": 25,
+    "series": [
+      { "year": 2006, "price": 73.2, "house": 72.5, "apartment": 72.5, "wage": 1561, "rate": 4.7 },
+      { "year": 2007, "price": 90.3, "house": 89.8, "apartment": 89.8, "wage": 1636, "rate": 5.5 },
+      { "year": 2008, "price": 106.2, "house": 106.2, "apartment": 106.2, "wage": 1801, "rate": 5.8 },
+      { "year": 2009, "price": 101.1, "house": 100.9, "apartment": 101.2, "wage": 1870, "rate": 5.2 },
+      { "year": 2010, "price": 100.0, "house": 99.6, "apartment": 100.2, "wage": 1915, "rate": 5.0 },
+      { "year": 2011, "price": 96.7, "house": 96.1, "apartment": 97.0, "wage": 1967, "rate": 5.6 },
+      { "year": 2012, "price": 91.5, "house": 90.7, "apartment": 91.9, "wage": 1988, "rate": 6.0 },
+      { "year": 2013, "price": 85.6, "house": 84.7, "apartment": 86.1, "wage": 1945, "rate": 6.3 },
+      { "year": 2014, "price": 78.1, "house": 77.1, "apartment": 78.6, "wage": 1892, "rate": 5.0 },
+      { "year": 2015, "price": 74.7, "house": 73.6, "apartment": 75.3, "wage": 1882, "rate": 4.1 },
+      { "year": 2016, "price": 73.7, "house": 72.2, "apartment": 75.0, "wage": 1879, "rate": 3.6 },
+      { "year": 2017, "price": 74.6, "house": 72.6, "apartment": 76.7, "wage": 1892, "rate": 3.1 },
+      { "year": 2018, "price": 76.1, "house": 73.6, "apartment": 79.0, "wage": 1939, "rate": 2.8 },
+      { "year": 2019, "price": 78.1, "house": 75.1, "apartment": 81.9, "wage": 1990, "rate": 2.6 },
+      { "year": 2020, "price": 79.3, "house": 75.8, "apartment": 84.0, "wage": 2060, "rate": 2.3 },
+      { "year": 2021, "price": 80.3, "house": 75.8, "apartment": 87.0, "wage": 2140, "rate": 1.9 },
+      { "year": 2022, "price": 84.4, "house": 78.6, "apartment": 93.5, "wage": 2202, "rate": 2.9 },
+      { "year": 2023, "price": 91.0, "house": 83.7, "apartment": 103.0, "wage": 2363, "rate": 4.3 },
+      { "year": 2024, "price": 97.1, "house": 88.1, "apartment": 112.3, "wage": 2528, "rate": 4.1 },
+      { "year": 2025, "price": 102.3, "house": 91.6, "apartment": 120.8, "wage": 2600, "rate": 3.5 }
+    ]
+  },
   "overburden": {
     "note": "Eurostat EU-SILC ilc_lvho07a/07c, 2024. Share of population spending >40% of disposable income on housing.",
     "allPopulation": { "cy": 2.4, "eu": 7.7 },
@@ -84,6 +111,20 @@
     "homeLeavingAge": { "cy": 27.2, "eu": 26.2 },
     "underOccupied": { "cy": 70, "eu": 33 },
     "overcrowding": { "cy": 2, "euHighest": 41 }
+  },
+  "underOccupation": {
+    "note": "Eurostat EU-SILC ilc_lvho05b, 2024. Share of population living in a dwelling deemed under-occupied (more bedrooms than the household standard).",
+    "year": 2024,
+    "roomsPerPerson": { "cy": 2.0, "eu": 1.7 },
+    "overcrowdingPct": { "cy": 2, "eu": 41 },
+    "countries": [
+      { "country": "Cyprus", "value": 70, "me": true },
+      { "country": "Ireland", "value": 67 },
+      { "country": "Malta", "value": 64 },
+      { "country": "EU average", "value": 33, "avg": true },
+      { "country": "Greece", "value": 13 },
+      { "country": "Romania", "value": 7 }
+    ]
   },
   "buyers2025": {
     "note": "Department of Lands & Surveys, 2025. Shares of residential sales documents.",

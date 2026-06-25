@@ -12,16 +12,16 @@ function Calculator() {
 
   const net = DATA.income.householdNet[household][earnings];
   const rent = DATA.rents[district][beds];
-  const burden = (rent / net) * 100;
+  const burden = Math.round((rent / net) * 100);
+  const residual = Math.round(net - rent);
   const zone = burden < 30 ? "calm" : burden <= 40 ? "warn" : "alarm";
-  const left = net - rent;
 
   const verdict =
     zone === "calm"
-      ? "Affordable — below the 30% comfort line."
+      ? "Affordable — below the 30% gross rule-of-thumb comfort line."
       : zone === "warn"
-      ? "Stretched — between the 30% comfort line and the 40% overburden line."
-      : "Overburdened — above the 40% line economists treat as unaffordable.";
+      ? "Stretched — above the gross comfort line but below Eurostat's 40% disposable-income overburden threshold."
+      : "Above Eurostat's 40% overburden line (disposable income) — check the euros left, not just the share.";
 
   const scale = 90; // meter runs 0–90% of income
   const pct = Math.min(burden, scale) / scale * 100;
@@ -69,16 +69,16 @@ function Calculator() {
       <div className="readout">
         <div className="ro"><span className="rok">Take-home, combined</span><span className="rov">{eur(net)}/mo</span></div>
         <div className="ro"><span className="rok">Asking rent</span><span className="rov">{eur(rent)}/mo</span></div>
-        <div className="ro"><span className="rok">Left for everything else</span><span className={"rov" + (left < 0 ? " neg" : "")}>{eur(left)}/mo</span></div>
+        <div className="ro"><span className="rok">After housing</span><span className={"rov" + (residual < 0 ? " neg" : "")}>{burden}% of income · {eur(residual)} left</span></div>
       </div>
 
       <div className="meterwrap">
         <div className="meterbar">
           <div className={"meterfill " + zone} style={{ width: pct + "%" }} />
-          <div className="mark" style={{ left: (30 / scale * 100) + "%" }}><span>30%</span></div>
-          <div className="mark" style={{ left: (40 / scale * 100) + "%" }}><span>40%</span></div>
+          <div className="mark mark-gross" style={{ left: (30 / scale * 100) + "%" }}><span>30% gross</span></div>
+          <div className="mark mark-eu" style={{ left: (40 / scale * 100) + "%" }}><span>40% net (EU)</span></div>
         </div>
-        <div className={"burdennum " + zone}>{burden.toFixed(0)}%<span> of take-home pay goes on rent</span></div>
+        <div className={"burdennum " + zone}>{burden}%<span> of take-home pay on rent (take-home basis)</span></div>
       </div>
       <p className={"verdict " + zone}>{verdict}</p>
       <p className="fineprint">
@@ -102,9 +102,9 @@ function OverburdenFlip() {
   const band = (H - padT - padB) / rows.length;
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="chart" role="img" aria-label="Share of households spending more than 40 percent of income on housing, Cyprus vs EU">
-      <text x={padL} y={22} className="charttit">Share spending more than 40% of income on housing</text>
-      <text x={padL} y={38} className="chartsub">Not the same as the 11% average above — this counts people in the danger zone</text>
+    <svg viewBox={`0 0 ${W} ${H}`} className="chart" role="img" aria-label="Eurostat housing cost overburden, Cyprus vs EU">
+      <text x={padL} y={22} className="charttit">Eurostat housing cost overburden (&gt;40% of disposable income)</text>
+      <text x={padL} y={38} className="chartsub">Not the gross 30% rule of thumb — this is the EU's official net-income measure</text>
       {[0, 5, 10, 15, 20].map((t) => (
         <g key={t}>
           <line x1={x(t)} x2={x(t)} y1={padT} y2={H - padB} className="grid" />
@@ -184,10 +184,10 @@ function TenureStack() {
   );
 }
 
-/* ---------- supply: vacancy, renters trend, under-occupation ---------- */
+/* ---------- supply: vacancy and renters trend ---------- */
 function SupplyVisuals() {
   const W = 680, H = 248, pad = 12;
-  const colW = (W - pad * 2 - 24) / 3;
+  const colW = (W - pad * 2 - 12) / 2;
   const cx = (i) => pad + i * (colW + 12) + colW / 2;
   const occ = 100 - DATA.supply.census2021VacantPct;
   const vac = DATA.supply.census2021VacantPct;
@@ -197,8 +197,8 @@ function SupplyVisuals() {
 
   return (
     <div className="supplygrid">
-      <svg viewBox={`0 0 ${W} ${H}`} className="chart" role="img" aria-label="Housing stock, renters and under-occupation">
-        {[0, 1, 2].map((i) => (
+      <svg viewBox={`0 0 ${W} ${H}`} className="chart" role="img" aria-label="Housing stock and renting households">
+        {[0, 1].map((i) => (
           <line key={i} x1={cx(i)} x2={cx(i)} y1={28} y2={H - 16} className="grid" strokeDasharray="2 4" />
         ))}
 
@@ -223,16 +223,6 @@ function SupplyVisuals() {
           <text x={cx(1) + 40} y={138} className="axis" textAnchor="middle">2025</text>
           <text x={cx(1) - 40} y={104} className="panellab" textAnchor="middle">{DATA.tenure.tenants2015}%</text>
           <text x={cx(1) + 40} y={104 - (DATA.tenure.tenants2025 - DATA.tenure.tenants2015) * 4} className="panellab" textAnchor="middle">{DATA.tenure.tenants2025}%</text>
-        </g>
-
-        <g>
-          <text x={cx(2)} y={28} className="paneltit" textAnchor="middle">Under-occupied homes</text>
-          <text x={cx(2) - 52} y={104} className="rowlab" textAnchor="end">EU</text>
-          <rect x={cx(2) - 44} y={92} width={(DATA.tenure.underOccupied.eu / 80) * 88} height={18} className="bar-eu" />
-          <text x={cx(2) - 44 + (DATA.tenure.underOccupied.eu / 80) * 88 + 6} y={106} className="barval-eu">{DATA.tenure.underOccupied.eu}%</text>
-          <text x={cx(2) - 52} y={142} className="rowlab" textAnchor="end">CY</text>
-          <rect x={cx(2) - 44} y={130} width={(DATA.tenure.underOccupied.cy / 80) * 88} height={18} className="bar-cy" />
-          <text x={cx(2) - 44 + (DATA.tenure.underOccupied.cy / 80) * 88 + 6} y={144} className="barval-cy">{DATA.tenure.underOccupied.cy}%</text>
         </g>
       </svg>
     </div>
@@ -452,6 +442,161 @@ function WageDistribution() {
         {" "}<strong>mean</strong> to the right while the <strong>median</strong>, the middle worker, changes little. That
         gap is why the average overstates the typical wage, and why this article uses the median.
       </p>
+    </div>
+  );
+}
+
+/* ---------- long-run: house prices vs wages, rebased to 2008 ---------- */
+function PriceVsWages() {
+  const { baseYear, series } = DATA.longRun;
+  const base = series.find((d) => d.year === baseYear) || series[0];
+  const data = series.map((d) => ({
+    year: d.year,
+    wage: (d.wage / base.wage) * 100,
+    house: (d.house / base.house) * 100,
+    apartment: (d.apartment / base.apartment) * 100,
+  }));
+  const W = 680, H = 380, padL = 44, padR = 108, padT = 20, padB = 36;
+  const yrs = data.map((d) => d.year);
+  const vals = data.flatMap((d) => [d.wage, d.house, d.apartment]);
+  const yMin = Math.min(60, ...vals), yMax = Math.max(120, ...vals);
+  const x = (yr) => padL + ((yr - yrs[0]) / (yrs[yrs.length - 1] - yrs[0])) * (W - padL - padR);
+  const y = (v) => padT + (1 - (v - yMin) / (yMax - yMin)) * (H - padT - padB);
+  const path = (k) => data.map((d, i) => (i ? "L" : "M") + x(d.year) + " " + y(d[k])).join(" ");
+  const last = data[data.length - 1];
+  return (
+    <div className="chartblock">
+      <svg viewBox={`0 0 ${W} ${H}`} className="chart" role="img" aria-label="House and apartment prices vs wages, rebased to 2008 = 100">
+        {[60, 80, 100, 120, 140].filter((t) => t >= yMin && t <= yMax).map((t) => (
+          <g key={t}>
+            <line x1={padL} x2={W - padR} y1={y(t)} y2={y(t)} className="grid" />
+            <text x={padL - 6} y={y(t)} className="axis" textAnchor="end" dominantBaseline="middle">{t}</text>
+          </g>
+        ))}
+        {yrs.filter((yr) => yr % 3 === 0).map((yr) => (
+          <text key={yr} x={x(yr)} y={H - padB + 18} className="axis" textAnchor="middle">{yr}</text>
+        ))}
+        <line x1={x(baseYear)} x2={x(baseYear)} y1={padT} y2={H - padB} className="grid" strokeDasharray="3 3" />
+        <text x={x(baseYear)} y={padT - 6} className="axis" textAnchor="middle">{baseYear}</text>
+        <path d={path("wage")} className="line-wage" fill="none" />
+        <path d={path("house")} className="line-house" fill="none" />
+        <path d={path("apartment")} className="line-apartment" fill="none" />
+        <text x={x(last.year) + 6} y={y(last.wage)} className="lab-wage" dominantBaseline="middle">wages</text>
+        <text x={x(last.year) + 6} y={y(last.house)} className="lab-house" dominantBaseline="middle">houses</text>
+        <text x={x(last.year) + 6} y={y(last.apartment)} className="lab-apartment" dominantBaseline="middle">apartments</text>
+      </svg>
+    </div>
+  );
+}
+
+/* ---------- mortgage payment-to-income vs price-to-income ---------- */
+function MortgageBurden() {
+  const { baseYear, termYears, series } = DATA.longRun;
+  const AF = (ratePct) => {
+    const r = (ratePct || 0) / 100 / 12;
+    const n = termYears * 12;
+    return r ? r / (1 - Math.pow(1 + r, -n)) : 1 / n;
+  };
+  const raw = series.map((d) => ({
+    year: d.year,
+    pti: d.price / d.wage,
+    payti: (d.price * AF(d.rate)) / d.wage,
+  }));
+  const b = raw.find((d) => d.year === baseYear) || raw[0];
+  const data = raw.map((d) => ({
+    year: d.year,
+    price: (d.pti / b.pti) * 100,
+    pay: (d.payti / b.payti) * 100,
+  }));
+
+  const W = 680, H = 360, padL = 44, padR = 96, padT = 20, padB = 36;
+  const yrs = data.map((d) => d.year);
+  const vals = data.flatMap((d) => [d.price, d.pay]);
+  const yMin = Math.min(60, ...vals), yMax = Math.max(140, ...vals);
+  const x = (yr) => padL + ((yr - yrs[0]) / (yrs[yrs.length - 1] - yrs[0])) * (W - padL - padR);
+  const y = (v) => padT + (1 - (v - yMin) / (yMax - yMin)) * (H - padT - padB);
+  const path = (k) => data.map((d, i) => (i ? "L" : "M") + x(d.year) + " " + y(d[k])).join(" ");
+  const last = data[data.length - 1];
+
+  return (
+    <div className="chartblock">
+      <svg viewBox={`0 0 ${W} ${H}`} className="chart" role="img" aria-label="Price-to-income vs mortgage-payment-to-income, 2008 = 100">
+      {[60, 80, 100, 120, 140].filter((t) => t >= yMin && t <= yMax).map((t) => (
+        <g key={t}>
+          <line x1={padL} x2={W - padR} y1={y(t)} y2={y(t)} className="grid" />
+          <text x={padL - 6} y={y(t)} className="axis" textAnchor="end" dominantBaseline="middle">{t}</text>
+        </g>
+      ))}
+      {yrs.filter((yr) => yr % 3 === 0).map((yr) => (
+        <text key={yr} x={x(yr)} y={H - padB + 18} className="axis" textAnchor="middle">{yr}</text>
+      ))}
+      <line x1={x(baseYear)} x2={x(baseYear)} y1={padT} y2={H - padB} className="grid" strokeDasharray="3 3" />
+      <path d={path("price")} className="line-pti" fill="none" />
+      <path d={path("pay")} className="line-payti" fill="none" />
+      <text x={x(last.year) + 6} y={y(last.price)} className="lab-pti" dominantBaseline="middle">price ÷ income</text>
+      <text x={x(last.year) + 6} y={y(last.pay)} className="lab-payti" dominantBaseline="middle">payment ÷ income</text>
+      </svg>
+    </div>
+  );
+}
+
+/* ---------- under-occupation: EU comparison ---------- */
+function UnderOccupation() {
+  const rows = DATA.underOccupation.countries;
+  const W = 680, H = 252, padL = 100, padR = 52, padT = 12, padB = 28, max = 75;
+  const x = (v) => padL + (v / max) * (W - padL - padR);
+  const band = (H - padT - padB) / rows.length;
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="chart" role="img" aria-label="Under-occupied homes, share of dwellings, 2024">
+      {[0, 25, 50, 75].map((t) => (
+        <g key={t}>
+          <line x1={x(t)} x2={x(t)} y1={padT} y2={H - padB} className="grid" />
+          <text x={x(t)} y={H - padB + 16} className="axis" textAnchor="middle">{t}%</text>
+        </g>
+      ))}
+      {rows.map((r, i) => {
+        const y = padT + band * i + band / 2;
+        const cls = r.me ? "bar-me" : r.avg ? "bar-avg" : "bar-eu";
+        const labCls = "rowlab" + (r.me ? " me" : "");
+        return (
+          <g key={r.country}>
+            <text x={padL - 10} y={y} className={labCls} textAnchor="end" dominantBaseline="middle">{r.country}</text>
+            <rect x={padL} y={y - 10} width={Math.max(0, x(r.value) - padL)} height={20} className={cls} rx="1" />
+            <text x={x(r.value) + 7} y={y} className="barval" dominantBaseline="middle">{r.value}%</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+/* ---------- mortgage payment: interest vs principal (interactive) ---------- */
+function PaymentSplit() {
+  const TERM = DATA.mortgage.termYears;
+  const [rate, setRate] = useState(3.4);
+  const r = rate / 100 / 12;
+  const n = TERM * 12;
+  const af = r ? r / (1 - Math.pow(1 + r, -n)) : 1 / n;
+  const totalPaid = af * n;
+  const intPct = Math.round(((totalPaid - 1) / totalPaid) * 100);
+  const prinPct = 100 - intPct;
+  const firstYrPct = Math.round((r / af) * 100);
+  return (
+    <div className="psplit">
+      <div className="efield solo">
+        <label>Mortgage interest rate <strong>{rate.toFixed(1)}%</strong></label>
+        <input type="range" min="1" max="7" step="0.1" value={rate} onChange={(e) => setRate(+e.target.value)} aria-label="Mortgage interest rate" />
+        <div className="erange"><span>1%</span><span className="emid">{TERM}-year loan</span><span>7%</span></div>
+      </div>
+      <div className="psbar">
+        <div className="psseg ps-prin" style={{ width: prinPct + "%" }}>{prinPct}%</div>
+        <div className="psseg ps-int" style={{ width: intPct + "%" }}>{intPct}%</div>
+      </div>
+      <div className="pslegend">
+        <span className="psleg"><i className="swatch w-prin" />Principal — you keep this, as equity</span>
+        <span className="psleg"><i className="swatch w-int" />Interest — a cost, like rent</span>
+      </div>
+      <p className="psnote">Over the life of the loan. Early payments are more interest-heavy — at this rate the first year is about {firstYrPct}% interest — and tilt toward principal as the balance falls.</p>
     </div>
   );
 }
@@ -743,9 +888,8 @@ export default function App() {
           On the official measures, Cyprus looks comfortable: households spend a smaller share of their income on housing
           than anywhere else in the EU. Yet asking rents have risen about a quarter in five years, the deposit needed to
           buy keeps first-time buyers renting, and the government's main grant for under-41s drew 525 applicants for a
-          scheme intended for around 400 recipients, of whom 152 have so far been approved. So how can Cyprus have both
-          affordable housing based on EU reporting, but also demand exceeding supply for affordable housing grants? This
-          interactive article attempts to explore that.
+          scheme intended for around 400 recipients, of whom 152 have so far been approved. The numbers below walk through
+          how both can be true at once.
         </p>
         <div className="herostats">
           <div className="hs"><span className="hsv">11%</span><span className="hsl">of income on housing across <em>all</em> households — lowest in the EU (avg 19%)</span></div>
@@ -771,9 +915,17 @@ export default function App() {
         <p className="body">
           News articles and headlines often try to dramatise what's really going on, and can sometimes pit a single
           minimum-wage earner against the rent on a two-bedroom flat — a situation almost no one is actually in. Using
-          the chart below, pick a more realistic household and see what share of take-home pay rent would take. The 30%
-          and 40% markers are based on Eurostat's overburden measure, which treats spending more than 40% of take-home
-          pay on housing as overburdened. Below 30% is generally comfortable; between the two is stretched.
+          the chart below, pick a more realistic household and see what share of take-home pay rent would take.
+        </p>
+        <p className="body">
+          A word on these percentages. The familiar "30%" guideline is built on gross, pre-tax
+          income, while the EU's official overburden line of 40% is built on disposable, after-tax income — so the same
+          household can look comfortable on one and stretched on the other, and the two should not be read as the same
+          rule. We show the euros left after housing alongside the share for a related reason: the percentage alone can
+          mislead. Because Cyprus taxes lightly at the bottom and more heavily at the top, a flat share of take-home pay
+          flags higher earners as more burdened than they really are. A couple spending 40% of their take-home but with
+          €2,000 left over each month is not in the position of one spending 40% with €400 left, and the residual figure
+          keeps that distinction in view.
         </p>
         <Calculator />
       </section>
@@ -798,9 +950,9 @@ export default function App() {
           </table>
         </div>
         <p className="caption">
-          Rent as a share of combined take-home pay, using median asking rents from property listings (June 2026).
-          Green &lt;30% (comfortable) &middot; amber 30–40% (stretched) &middot; red &gt;40% (overburdened, Eurostat
-          threshold).
+          Rent as a share of combined take-home pay (take-home basis), using median asking rents from property listings
+          (June 2026). Green &lt;30% (gross rule-of-thumb comfort) &middot; amber 30–40% &middot; red &gt;40%
+          (Eurostat housing cost overburden on disposable income).
         </p>
       </section>
 
@@ -813,35 +965,68 @@ export default function App() {
         </p>
         <TenureStack />
         <p className="body afterchart">
-          A different Eurostat measure asks who spends <strong>more than 40%</strong> of their income on housing. Across
+          A different Eurostat measure asks who spends <strong>more than 40%</strong> of their disposable (after-tax)
+          income on housing — the EU's official housing cost overburden statistic, not the gross 30% rule of thumb. Across
           the whole population that is only {DATA.overburden.allPopulation.cy}%; among market-price renters it rises to
           {" "}{DATA.overburden.marketTenant.cy}%. Most owners face little or no housing cost — often inherited outright
           — so they barely register in the headline figure; the strain concentrates among renters paying today's prices.
         </p>
         <OverburdenFlip />
         <p className="caption">
-          Source: Eurostat EU-SILC, 2024. The 11% is average housing cost as a share of income; 2.4% and 14.4% are the
-          share of households above the 40% overburden line. Even Cyprus's market renters (14.4%) are less overburdened
-          than the average EU renter (19.2%) — a low base eroding unevenly, with the strain falling on new entrants the
-          averages do not capture.
+          Source: Eurostat EU-SILC, 2024. The 11% is average housing cost as a share of disposable income; 2.4% and 14.4%
+          are the share of households above Eurostat's 40% housing cost overburden line (disposable income). Even Cyprus's
+          market renters (14.4%) are less overburdened than the average EU renter (19.2%) — a low base that is tightening
+          unevenly,
+          with the strain falling on new entrants the averages miss.
         </p>
       </section>
 
       <section>
-        <h2>Did rents outpace pay? It depends what you measure</h2>
+        <h2>Did rents outpace pay? It depends what you measure — and what you count as a price</h2>
         <p className="body">
-          Wages and asking rents both rose strongly since 2020 — but Cyprus rents moved roughly twice as fast as the EU,
-          while the official rent index for sitting tenants barely moved. Purchase prices tell a similar story: the CBC's
-          Residential Property Price Index (RPPI) — based on actual transaction prices, not portal listings — rose
-          {" "}{DATA.cbcRppi.headlineYoY}% year-on-year in Q4 2025, accelerating from {DATA.cbcRppi.priorQuarterYoY}% in Q3.
-          Apartments were up {DATA.cbcRppi.apartmentsYoY}%; houses {DATA.cbcRppi.housesYoY}%.
+          The charts that follow start with purchase prices because that is where the long-cycle story shows up clearest.
+          Over a 20-year period, Cypriot prices peaked in 2008, fell by about a third through the crisis, and have climbed
+          back since; by late 2025 the overall CBC index was only a few per cent above its 2010 level, with houses still
+          below it and apartments well above, indicating that people are more interested in buying apartments than houses,
+          but that could just be an affordability question rather than preferences. The IMF, reviewing the market in 2023,
+          found no sign of overvaluation and put price-to-income at or below its long-run average.
+        </p>
+        <PriceVsWages />
+        <p className="caption">
+          Wages, house prices and apartment prices, all set to 100 in {DATA.longRun.baseYear}. Wages: CYSTAT average gross
+          monthly earnings (2019–2021 interpolated; 2024–2025 estimated). Houses and apartments: CBC RPPI paths scaled to the
+          overall cycle (2025 anchors: houses 94.2, apartments 123.9 on the CBC index, 2010 = 100). Apartments have pulled
+          ahead since the recovery; houses are still below their pre-crisis level.
+        </p>
+        <p className="body">
+          The asking price is only part of what a buyer feels each month — the mortgage payment matters just as much, and
+          that depends on the interest rate at least as much as the price. When rates are low, people can afford a pricier
+          home for the same monthly bill, which is one reason values climbed again after the crisis. The chart below
+          compares sticker price against income with what buyers actually pay each month. On that measure, buying barely
+          got harder during the recovery — and in some years it got easier. Since 2022, rates going back up have mattered
+          more than prices alone. Missed mortgage payments, in the arrears section above, catch strain on the ground better
+          than any index — though those figures also jump when electricity and other bills rise at once.
+        </p>
+        <MortgageBurden />
+        <p className="caption">
+          Cost of buying a typical home, two ways, both set to 100 in {DATA.longRun.baseYear}. The dashed line is the house
+          price against income; the solid line is the actual monthly mortgage payment against income, which also reflects the
+          interest rate. Cypriot rates stayed high through the post-2008 banking crisis, peaking near 6.7% in 2013, fell to
+          about 1.7% by 2021, and have climbed again since 2022 — so the payment line ran above the price line in the crisis
+          years, dipped below it through the cheap-credit late 2010s, and the squeeze for buyers now is the rate rise, not
+          the price.
+        </p>
+        <p className="body">
+          Since 2020, wages and asking rents have both risen — but Cyprus rents moved roughly twice as fast as the EU,
+          while the official rent index for sitting tenants barely moved. The CBC's RPPI rose {DATA.cbcRppi.headlineYoY}%
+          year-on-year in Q4 2025, accelerating from {DATA.cbcRppi.priorQuarterYoY}% in Q3 — apartments up
+          {" "}{DATA.cbcRppi.apartmentsYoY}%, houses {DATA.cbcRppi.housesYoY}%.
         </p>
         <RentWageDivergence />
         <p className="caption">
-          Indexed to 2020 = 100. Cyprus wages: CYSTAT; EU rents: Eurostat HICP actual rentals; CBC RPPI: transaction
-          (closing) purchase prices, Q4 readings reindexed. The Cyprus asking-rent line is the author's index from listing
-          data. Cyprus wages tracked EU wages closely enough that a separate EU-wage line would sit on top — so it is
-          omitted. DLS recorded a Nicosia three-bedroom average rent rising from €950 to €1,300 in a single year (2024–25).
+          Indexed to 2020 = 100. Cyprus wages: CYSTAT; EU rents: Eurostat HICP actual rentals; purchase prices: FRED
+          QCYN628BIS reindexed. The Cyprus asking-rent line is the author's index from listing data. DLS recorded a Nicosia
+          three-bedroom average rent rising from €950 to €1,300 in a single year (2024–25).
         </p>
       </section>
 
@@ -894,13 +1079,35 @@ export default function App() {
         <p className="body">
           CBC data show new housing loans rising about {DATA.prices.newHousingLoansGrowth}% year-on-year — lending is
           growing. But that does not mean buying has become easy. Much of the demand is chasing too few homes in the right
-          places and at the right price: a supply squeeze that pushes transaction prices up in classic demand-and-supply
-          fashion, especially for apartments. Andreas and Elena are not short of credit in theory; they are short of a
+          places and at the right price: a supply squeeze that pushes transaction prices up in plain supply-and-demand
+          terms, especially for apartments. Andreas and Elena are not short of credit in theory; they are short of a
           deposit, and of stock they can afford at prices that keep climbing.
         </p>
         <WageLadder net note={<>Monthly take-home (net) pay per worker. A couple's household income is two of these, so
           a median couple takes home about {eur(DATA.income.net.median * 2)} — the figure the savings estimate below uses.</>} />
         <DepositSaver />
+        <aside className="ownersidebar">
+          <p className="ownersidebar-tit">A note for buyers: not all of a mortgage is a cost</p>
+          <p className="body">
+            When a renter pays €900, the whole sum is gone. When an owner pays €900 on a mortgage, part is interest — a
+            genuine cost, like rent — and part is principal, which pays down the loan and becomes equity the household keeps.
+            Early on the split is about half and half, but over the whole loan only about a third of what you pay is interest
+            and the rest builds equity — so the owner's true cost is well below the headline payment, not half of it,
+            before maintenance and any change in the home's value. Measuring a renter's full payment against an owner's full
+            payment therefore overstates what owning actually costs.
+          </p>
+          <PaymentSplit />
+          <p className="body">
+            This is why a house doubles as a savings account in many households: the mortgage forces a monthly deposit into
+            an asset, and in a rising market the annual cost of owning has at times fallen below zero. That does not mean
+            this is a care-free way to invest: that equity is leveraged, illiquid and undiversified; appreciation is never
+            guaranteed and moves in long cycles; and the same arithmetic runs in reverse when prices fall. A Cypriot who
+            bought at the 2008 peak then watched prices drop by a third over the next seven years, while still paying
+            interest and upkeep, faced a true cost of owning well above the payment, not below it. Forced saving is a real
+            and underrated part of the picture, but viewing it as an investment is still a gamble on the housing market and
+            economy.
+          </p>
+        </aside>
       </section>
 
       <section className="band">
@@ -941,9 +1148,14 @@ export default function App() {
         <p className="body">
           The shortage is therefore not of housing in general — the renting share has risen from
           {" "}{DATA.tenure.tenants2015}% in 2015 to {DATA.context.renters2024}% — but of modern, long-term rental homes in
-          the cities where the jobs are. Cyprus has the EU's highest share of under-occupied homes
-          ({DATA.tenure.underOccupied.cy}% against {DATA.tenure.underOccupied.eu}%): space exists, but much of it is
-          owner-occupied and in the wrong places.
+          the cities where the jobs are.
+        </p>
+        <p className="body">
+          Some of this empty stock is genuinely seasonal, and that need not be purely a loss: other Mediterranean regions
+          have made the swing work both ways, housing tourists in the high season and local renters, students or workers in
+          the low one, and Cyprus could lean further in that direction. But it is a partial fix rather than a cure. Many
+          empty units are in the wrong places or held deliberately as investments, and seasonal letting does little for
+          someone who needs a stable home the year round.
         </p>
         <p className="body">
           A growing share of what could be long-term housing has also moved to tourists. Short-term holiday lets in the
@@ -953,11 +1165,46 @@ export default function App() {
         </p>
         <SupplyVisuals />
         <p className="caption">
-          Census: CYSTAT 2021. Under-occupation and renting share: Eurostat / Central Bank of Cyprus. ETEK estimates about
+          Census: CYSTAT 2021. Renting share: Eurostat / Central Bank of Cyprus. ETEK estimates about
           {" "}{DATA.supply.idleStockEstimateEtek.toLocaleString()} genuinely idle urban units — far below census vacancy.
           The ~{DATA.supply.decadeGapEstimate.toLocaleString()}-home gap cited in policy debates is a sector estimate from
           a 2026 Nicosia forum (reported by Cyprus Property News), not an official census count — a rough gauge of unmet
           need over the decade, against which affordable schemes are measured.
+        </p>
+      </section>
+
+      <section>
+        <h2>The space is there, just badly shared</h2>
+        <p className="body">
+          Scarcity is only half the story. Cyprus has the highest rate of under-occupied homes in the European Union —
+          around {DATA.underOccupation.countries[0].value}% of households live in a home with more bedrooms than the standard
+          reckons they need, against an EU average of a third — and among the most living space per person in the bloc
+          ({DATA.underOccupation.roomsPerPerson.cy} rooms per person against {DATA.underOccupation.roomsPerPerson.eu} in
+          the EU), with the lowest overcrowding rate ({DATA.underOccupation.overcrowdingPct.cy}%, against
+          {" "}{DATA.underOccupation.overcrowdingPct.eu}% in the worst-affected EU countries). The stock is not only tight;
+          it is unevenly shared. Eurostat's own explanation is the familiar one: older couples and
+          individuals staying on in the family home long after the children have grown and gone, so that two people occupy a
+          house built for six while a young household nearby makes do with a studio.
+        </p>
+        <p className="body">
+          Part of what keeps that pattern frozen is the tax system. Cyprus abolished its annual immovable property tax in
+          2017, so there is now almost no recurring cost to owning more space than you use; holding a large, half-empty home
+          is close to free. At the same time, a 20% capital gains tax falls on the profit when a property is sold, which adds
+          friction to the very downsizing that would free the space up. The incentives point towards staying put — even when
+          the home no longer fits.
+        </p>
+        <UnderOccupation />
+        <p className="caption">
+          Share of homes larger than the occupying household is reckoned to need, {DATA.underOccupation.year} (Eurostat).
+          Cyprus is the highest in the EU, more than double the average.
+        </p>
+        <p className="body">
+          None of this makes under-occupation a villainy; people value their homes for reasons that have nothing to do with
+          square metres, and a reshuffling of who lives where is slow, politically awkward and only ever partial. But the
+          figures are a useful corrective to the idea that building more is the only answer. A good deal of the housing Cyprus
+          is short of may already be standing — it is simply held by people who do not need all of it, and given little
+          reason to move. The same point applies to the empty homes above: what is scarce is often not the stock itself, but
+          homes that are actually available to let or buy.
         </p>
       </section>
 
@@ -979,7 +1226,7 @@ export default function App() {
       </section>
 
       <section className="band">
-        <h2>What the state is doing, and its scale</h2>
+        <h2>What the state is doing — and how small it is next to the gap</h2>
         <p className="body">
           The policy response is real but small against the shortfall. More than 560 applications have come in across the
           new affordable schemes; the main young-buyer grant alone drew 525 for a programme intended for around 400
@@ -1004,10 +1251,10 @@ export default function App() {
         <p className="body">
           Cyprus still has one of the lowest housing burdens in the EU — and that is what the averages capture. But the
           margin is narrowing unevenly: asking rents have risen roughly twice as fast as the EU average over five years,
-          and arrears already run above average. The cost is not carried by the average household but by those entering the
-          market — renters signing new leases, couples short of a deposit, workers who have moved for a job. Cyprus is not
-          the worst in Europe, and is unlikely to become so soon. The open question is whether the homes now being built are
-          ones those households can afford to live in.
+          and arrears already run above average. The cost falls on people entering the market — renters signing new leases,
+          couples short of a deposit, workers who have moved for a job. Cyprus is not the worst in Europe, and is unlikely
+          to become so soon. The question is whether the homes now being built are ones those households can afford to live
+          in.
         </p>
       </section>
 
@@ -1030,6 +1277,10 @@ export default function App() {
           permitted floor area. These are attributed sector estimates, not official statistics. Affordable-scheme
           application and approval figures: Interior Minister Constantinos Ioannou, in replies to parliamentary questions
           (2025–26).
+        </p>
+        <p className="fineprint foottech">
+          <strong>Built with:</strong> React 18, Vite 5, and @vitejs/plugin-react. Charts are hand-drawn SVG in React — no
+          charting library. Fonts via Google Fonts (Space Grotesk, Source Serif 4, IBM Plex Mono).
         </p>
         <p className="authorfoot">
           By <a href="https://medium.com/@thomascgeorgiou" rel="noopener noreferrer">Thomas Georgiou</a>
@@ -1079,12 +1330,17 @@ section{padding-top:84px;}
 h2{position:relative;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:clamp(24px,3.6vw,33px);line-height:1.13;letter-spacing:-.02em;margin-bottom:20px;padding-top:22px;}
 h2::before{content:"";position:absolute;top:0;left:0;width:36px;height:3px;background:var(--calm);}
 .sub{font-size:19px;line-height:1.6;color:var(--muted);margin-bottom:32px;max-width:600px;}
-.body{font-size:18.5px;margin-bottom:18px;}
+.body{font-size:18.5px;margin-bottom:20px;}
 .body strong{font-weight:600;}
 .body em{font-style:italic;}
-.afterchart{margin-top:28px;}
-.caption{font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.65;color:var(--muted);margin-top:18px;padding-left:14px;border-left:2px solid var(--line);}
-.fineprint{font-family:'IBM Plex Mono',monospace;font-size:11.5px;line-height:1.65;color:var(--muted);margin-top:18px;}
+.afterchart{margin-top:24px;margin-bottom:20px;}
+.chartblock{margin:20px 0 0;}
+.chartblock .chart{margin:0;}
+.caption{font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.65;color:var(--muted);margin:14px 0 24px;padding-left:14px;border-left:2px solid var(--line);}
+.caption + .body{margin-top:4px;}
+.body + .chartblock,.body + .chart,.body + .divwrap,.body + .calc,.body + .dist,.body + .supplygrid{margin-top:8px;}
+.fineprint{font-family:'IBM Plex Mono',monospace;font-size:11.5px;line-height:1.65;color:var(--muted);margin-top:16px;}
+.fineprint.foottech{margin-top:20px;padding-top:18px;border-top:1px solid var(--line);}
 
 /* cards (tools) */
 .calc,.dist{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:28px;box-shadow:0 1px 2px rgba(28,27,24,.03);}
@@ -1117,7 +1373,7 @@ h2::before{content:"";position:absolute;top:0;left:0;width:36px;height:3px;backg
 .verdict.calm{color:var(--calm);}.verdict.warn{color:#a4761d;}.verdict.alarm{color:var(--alarm);}
 
 /* charts */
-.chart{width:100%;height:auto;margin:10px 0 4px;overflow:visible;display:block;}
+.chart{width:100%;height:auto;margin:16px 0 0;overflow:visible;display:block;}
 .grid{stroke:var(--line);stroke-width:1;}
 .axisline{stroke:var(--ink);stroke-width:1;}
 .axis{font-family:'IBM Plex Mono',monospace;font-size:11px;fill:var(--muted);}
@@ -1125,8 +1381,32 @@ h2::before{content:"";position:absolute;top:0;left:0;width:36px;height:3px;backg
 .charttit{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;fill:var(--ink);}
 .chartsub{font-family:'IBM Plex Mono',monospace;font-size:10.5px;fill:var(--muted);}
 .bar-cy{fill:var(--alarm);}.bar-eu{fill:#c7c1b0;}
+.bar-me{fill:var(--alarm);}.bar-avg{fill:#9a9485;}
+.barval{font-family:'IBM Plex Mono',monospace;font-size:12px;fill:var(--ink);font-weight:500;}
+.rowlab.me{font-weight:600;fill:var(--alarm);}
 .barval-cy{font-family:'IBM Plex Mono',monospace;font-size:12px;fill:var(--alarm);font-weight:500;}
 .barval-eu{font-family:'IBM Plex Mono',monospace;font-size:12px;fill:var(--muted);}
+.bar-interest{fill:var(--warn);}.bar-principal{fill:var(--calm);}
+.mark-gross{border-color:#a39e90;}.mark-eu{border-color:var(--ink);}
+.ownersidebar{margin-top:36px;padding:28px 28px 24px;background:var(--card);border:1px solid var(--line);border-radius:4px;}
+.ownersidebar-tit{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:17px;margin-bottom:16px;}
+.ownersidebar .body{font-size:16.5px;margin-bottom:16px;}
+.ownersidebar .body:last-child{margin-bottom:0;}
+.psplit{margin-top:18px;}
+.efield.solo{margin-bottom:4px;}
+.efield.solo label{display:block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:11px;}
+.efield.solo label strong{font-family:'Space Grotesk',sans-serif;font-size:15px;letter-spacing:0;text-transform:none;color:var(--ink);margin-left:6px;}
+.efield.solo input[type=range]{width:100%;margin:4px 0 6px;}
+.erange{display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted);}
+.erange .emid{text-transform:uppercase;letter-spacing:.08em;}
+.psbar{display:flex;height:30px;border-radius:3px;overflow:hidden;border:1px solid var(--line);margin:14px 0 10px;}
+.psseg{display:flex;align-items:center;justify-content:center;font:600 12px 'Space Grotesk',sans-serif;color:#fff;min-width:0;}
+.ps-prin{background:#345b86;}.ps-int{background:#bf8a2c;}
+.pslegend{display:flex;flex-wrap:wrap;gap:6px 18px;font:11px 'IBM Plex Mono',monospace;color:var(--muted);}
+.psleg{display:inline-flex;align-items:center;}
+.swatch{display:inline-block;width:10px;height:10px;margin-right:6px;border-radius:1px;}
+.swatch.w-prin{background:#345b86;}.swatch.w-int{background:#bf8a2c;}
+.psnote{font-size:13.5px;line-height:1.5;color:var(--muted);margin-top:10px;}
 .seg-dom{fill:var(--calm);}.seg-eu{fill:#7ea4c6;}.seg-non{fill:var(--alarm);}
 .segval{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;fill:#fff;}
 .seglab{font-family:'IBM Plex Mono',monospace;font-size:11.5px;fill:var(--muted);}
@@ -1195,6 +1475,16 @@ h2::before{content:"";position:absolute;top:0;left:0;width:36px;height:3px;backg
 .ln-wage{stroke:var(--calm);stroke-width:2.5;}
 .ln-off{stroke:#bdb7a6;stroke-width:2;}
 .ln-rppi{stroke:#4a6741;stroke-width:2.5;stroke-dasharray:6 4;}
+.line-house{stroke:#8b7355;stroke-width:2;stroke-dasharray:5 3;}
+.line-apartment{stroke:#c5532e;stroke-width:2.5;}
+.line-wage{stroke:#345b86;stroke-width:2.5;}
+.lab-house{fill:#8b7355;font:500 12px 'IBM Plex Mono',monospace;}
+.lab-apartment{fill:#c5532e;font:500 12px 'IBM Plex Mono',monospace;}
+.lab-wage{fill:#345b86;font:500 12px 'IBM Plex Mono',monospace;}
+.line-pti{stroke:#bf8a2c;stroke-width:2;stroke-dasharray:4 3;}
+.line-payti{stroke:#1c1b18;stroke-width:2.5;}
+.lab-pti{fill:#bf8a2c;font:500 12px 'IBM Plex Mono',monospace;}
+.lab-payti{fill:#1c1b18;font:500 12px 'IBM Plex Mono',monospace;}
 .divlegend{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);}
 .leg{display:inline-flex;align-items:center;gap:7px;}
 .legline{width:22px;height:0;border-top-width:3px;border-top-style:solid;display:inline-block;}
@@ -1243,7 +1533,9 @@ tbody td{padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:to
 .schemes .rc{color:var(--muted);font-style:italic;}
 
 /* footer */
-.foot{border-top:1px solid var(--line);margin-top:88px;padding-top:28px;padding-bottom:80px;}
+.foot{border-top:1px solid var(--line);margin-top:88px;padding-top:32px;padding-bottom:80px;}
+.foot > p{margin-bottom:18px;}
+.foot > p:last-child{margin-bottom:0;}
 .foot p{font-family:'IBM Plex Mono',monospace;font-size:11.5px;line-height:1.75;color:var(--muted);}
 .foot strong{color:var(--ink);font-weight:600;}
 
